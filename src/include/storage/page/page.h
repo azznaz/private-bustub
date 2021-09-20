@@ -89,5 +89,4 @@ class Page {
   /** Page latch. */
   ReaderWriterLatch rwlatch_;
 };
-
 }  // namespace bustub

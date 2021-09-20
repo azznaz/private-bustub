@@ -13,6 +13,7 @@
 #pragma once
 
 #include "buffer/buffer_pool_manager.h"
+#include "buffer/buffer_pool_manager_instance.h"
 #include "recovery/log_manager.h"
 #include "storage/disk/disk_manager.h"
 #include "storage/page/page.h"
@@ -86,5 +87,11 @@ class ParallelBufferPoolManager : public BufferPoolManager {
    * Flushes all the pages in the buffer pool to disk.
    */
   void FlushAllPagesImpl() override;
+
+ private:
+  BufferPoolManagerInstance **bpm_table_;
+  size_t start_index_ = 0;
+  const uint32_t num_instances_ = 1;
+  const size_t pool_size_;
 };
 }  // namespace bustub

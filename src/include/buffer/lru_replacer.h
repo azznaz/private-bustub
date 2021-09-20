@@ -47,6 +47,8 @@ class LRUReplacer : public Replacer {
 
  private:
   // TODO(student): implement me!
+  size_t max_num_pages_;
+  std::list<frame_id_t> lru_;
 };
 
 }  // namespace bustub
