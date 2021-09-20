@@ -20,7 +20,6 @@ LRUReplacer::~LRUReplacer() = default;
 
 bool LRUReplacer::Victim(frame_id_t *frame_id) {
   if (lru_.empty()) {
-
     return false;
   }
   *frame_id = lru_.front();
@@ -29,18 +28,15 @@ bool LRUReplacer::Victim(frame_id_t *frame_id) {
 }
 
 void LRUReplacer::Pin(frame_id_t frame_id) {
-
   for (auto iter = lru_.begin(); iter != lru_.end(); iter++) {
     if ((*iter) == frame_id) {
       lru_.erase(iter);
       break;
     }
   }
-
 }
 
 void LRUReplacer::Unpin(frame_id_t frame_id) {
-
   bool flag = false;
   for (auto ele : lru_) {
     if (ele == frame_id) {
