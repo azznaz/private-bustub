@@ -12,10 +12,10 @@
 
 #pragma once
 
+#include <list>
 #include <memory>
 #include <stdexcept>
 #include <vector>
-
 #include "common/exception.h"
 #define LOG_INFO printf
 namespace bustub {
