@@ -33,7 +33,7 @@ bool LRUReplacer::Victim(frame_id_t *frame_id) {
 
 void LRUReplacer::Pin(frame_id_t frame_id) {
   latch_.lock();
-  if(mp_.count(frame_id) !=0 ){
+  if (mp_.count(frame_id) != 0) {
     lru_.erase(mp_[frame_id]);
     mp_.erase(frame_id);
   }
@@ -42,7 +42,7 @@ void LRUReplacer::Pin(frame_id_t frame_id) {
 
 void LRUReplacer::Unpin(frame_id_t frame_id) {
   latch_.lock();
-  if(mp_.count(frame_id) == 0){
+  if (mp_.count(frame_id) == 0) {
     lru_.push_back(frame_id);
     auto iter = lru_.end();
     iter--;

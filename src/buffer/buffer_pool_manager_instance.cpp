@@ -152,20 +152,15 @@ Page *BufferPoolManagerInstance::FetchPgImp(page_id_t page_id) {
   r->pin_count_ = 1;
   replacer_->Pin(frame_id);
   disk_manager_->ReadPage(r->page_id_, r->data_);
-
   page_table_[page_id] = frame_id;
-
   return r;
-
 }
-
 bool BufferPoolManagerInstance::DeletePgImp(page_id_t page_id) {
   // 0.   Make sure you call DeallocatePage!
   // 1.   Search the page table for the requested page (p).
   // 1.   If p does not exist, return true.
   // 2.   If p exists, but has a non-zero pin-count, return false. Someone is using the page.
   // 3.   Otherwise, p can be deleted. Remove p from the page table, reset its metadata and return it to the free list.
-
   std::lock_guard<std::mutex> lg(latch_);
   if (page_table_.count(page_id) == 0) {
     DeallocatePage(page_id);
@@ -192,7 +187,7 @@ bool BufferPoolManagerInstance::DeletePgImp(page_id_t page_id) {
 
 bool BufferPoolManagerInstance::UnpinPgImp(page_id_t page_id, bool is_dirty) {
   std::lock_guard<std::mutex> lg(latch_);
- // assert(page_table_.count(page_id) != 0);
+  // assert(page_table_.count(page_id) != 0);
   if (page_table_.count(page_id) == 0) {
     return true;
   }
