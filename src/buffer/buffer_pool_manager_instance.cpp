@@ -107,7 +107,7 @@ Page *BufferPoolManagerInstance::NewPgImp(page_id_t *page_id) {
   p->pin_count_ = 1;
   p->is_dirty_ = false;
   p->ResetMemory();
-  disk_manager_->WritePage(p->page_id_,p->data_);
+  disk_manager_->WritePage(p->page_id_, p->data_);
   // replacer_->Pin(frame_id);
   page_table_[p->page_id_] = frame_id;
   return p;
