@@ -55,7 +55,6 @@ class ParallelBufferPoolManager : public BufferPoolManager {
 
   Page *FetchPgImp(page_id_t page_id) override;
 
-
   /**
    * Unpin the target page from the buffer pool.
    * @param page_id id of page to be unpinned
@@ -64,7 +63,6 @@ class ParallelBufferPoolManager : public BufferPoolManager {
    */
 
   bool UnpinPgImp(page_id_t page_id, bool is_dirty) override;
-
 
   /**
    * Flushes the target page to disk.
@@ -90,7 +88,6 @@ class ParallelBufferPoolManager : public BufferPoolManager {
 
   bool DeletePgImp(page_id_t page_id) override;
 
-
   /**
    * Flushes all the pages in the buffer pool to disk.
    */
@@ -101,7 +98,5 @@ class ParallelBufferPoolManager : public BufferPoolManager {
   size_t start_index_ = 0;
   uint32_t num_instances_ = 1;
   size_t pool_size_;
-
-
 };
 }  // namespace bustub

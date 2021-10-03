@@ -120,7 +120,6 @@ class BufferPoolManager {
 
   virtual bool UnpinPgImp(page_id_t page_id, bool is_dirty) = 0;
 
-
   /**
    * Flushes the target page to disk.
    * @param page_id id of page to be flushed, cannot be INVALID_PAGE_ID
@@ -128,7 +127,6 @@ class BufferPoolManager {
    */
 
   virtual bool FlushPgImp(page_id_t page_id) = 0;
-
 
   /**
    * Creates a new page in the buffer pool.
@@ -138,7 +136,6 @@ class BufferPoolManager {
 
   virtual Page *NewPgImp(page_id_t *page_id) = 0;
 
-
   /**
    * Deletes a page from the buffer pool.
    * @param page_id id of page to be deleted
@@ -147,12 +144,10 @@ class BufferPoolManager {
 
   virtual bool DeletePgImp(page_id_t page_id) = 0;
 
-
   /**
    * Flushes all the pages in the buffer pool to disk.
    */
 
   virtual void FlushAllPgsImp() = 0;
-
 };
 }  // namespace bustub

@@ -45,44 +45,28 @@ BufferPoolManager *ParallelBufferPoolManager::GetBufferPoolManager(page_id_t pag
   return this->bpm_table_[index];
 }
 
-<<<<<<< HEAD
-Page *ParallelBufferPoolManager::FetchPageImp(page_id_t page_id) {
-=======
 Page *ParallelBufferPoolManager::FetchPgImp(page_id_t page_id) {
->>>>>>> public/master
   // Fetch page for page_id from responsible BufferPoolManagerInstance
   size_t index = page_id % num_instances_;
   Page *p = this->bpm_table_[index]->FetchPage(page_id);
   return p;
 }
 
-<<<<<<< HEAD
-bool ParallelBufferPoolManager::UnpinPageImp(page_id_t page_id, bool is_dirty) {
-=======
 bool ParallelBufferPoolManager::UnpinPgImp(page_id_t page_id, bool is_dirty) {
->>>>>>> public/master
   // Unpin page_id from responsible BufferPoolManagerInstance
   size_t index = page_id % num_instances_;
   bool flag = this->bpm_table_[index]->UnpinPage(page_id, is_dirty);
   return flag;
 }
 
-<<<<<<< HEAD
-bool ParallelBufferPoolManager::FlushPageImp(page_id_t page_id) {
-=======
 bool ParallelBufferPoolManager::FlushPgImp(page_id_t page_id) {
->>>>>>> public/master
   // Flush page_id from responsible BufferPoolManagerInstance
   size_t index = page_id % num_instances_;
   bool flag = this->bpm_table_[index]->FlushPage(page_id);
   return flag;
 }
 
-<<<<<<< HEAD
-Page *ParallelBufferPoolManager::NewPageImp(page_id_t *page_id) {
-=======
 Page *ParallelBufferPoolManager::NewPgImp(page_id_t *page_id) {
->>>>>>> public/master
   // create new page. We will request page allocation in a round robin manner from the underlying
   // BufferPoolManagerInstances
   // 1.   From a starting index of the BPMIs, call NewPageImpl until either 1) success and return 2) looped around to
@@ -104,22 +88,14 @@ Page *ParallelBufferPoolManager::NewPgImp(page_id_t *page_id) {
   return nullptr;
 }
 
-<<<<<<< HEAD
-bool ParallelBufferPoolManager::DeletePageImp(page_id_t page_id) {
-=======
 bool ParallelBufferPoolManager::DeletePgImp(page_id_t page_id) {
->>>>>>> public/master
   // Delete page_id from responsible BufferPoolManagerInstance
   size_t index = page_id % num_instances_;
   bool flag = this->bpm_table_[index]->DeletePage(page_id);
   return flag;
 }
 
-<<<<<<< HEAD
-void ParallelBufferPoolManager::FlushAllPagesImp() {
-=======
 void ParallelBufferPoolManager::FlushAllPgsImp() {
->>>>>>> public/master
   // flush all pages from all BufferPoolManagerInstances
   for (size_t i = 0; i < num_instances_; i++) {
     this->bpm_table_[i]->FlushAllPages();

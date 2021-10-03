@@ -67,7 +67,6 @@ class BufferPoolManagerInstance : public BufferPoolManager {
 
   Page *FetchPgImp(page_id_t page_id) override;
 
-
   /**
    * Unpin the target page from the buffer pool.
    * @param page_id id of page to be unpinned
@@ -77,7 +76,6 @@ class BufferPoolManagerInstance : public BufferPoolManager {
 
   bool UnpinPgImp(page_id_t page_id, bool is_dirty) override;
 
-
   /**
    * Flushes the target page to disk.
    * @param page_id id of page to be flushed, cannot be INVALID_PAGE_ID
@@ -85,7 +83,6 @@ class BufferPoolManagerInstance : public BufferPoolManager {
    */
 
   bool FlushPgImp(page_id_t page_id) override;
-
 
   /**
    * Creates a new page in the buffer pool.
@@ -95,7 +92,6 @@ class BufferPoolManagerInstance : public BufferPoolManager {
 
   Page *NewPgImp(page_id_t *page_id) override;
 
-
   /**
    * Deletes a page from the buffer pool.
    * @param page_id id of page to be deleted
@@ -104,13 +100,11 @@ class BufferPoolManagerInstance : public BufferPoolManager {
 
   bool DeletePgImp(page_id_t page_id) override;
 
-
   /**
    * Flushes all the pages in the buffer pool to disk.
    */
 
   void FlushAllPgsImp() override;
-
 
   /**
    * Allocate a page on disk.∂
