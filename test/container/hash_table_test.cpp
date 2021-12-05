@@ -24,13 +24,16 @@ namespace bustub {
 // NOLINTNEXTLINE
 
 // NOLINTNEXTLINE
-TEST(HashTableTest, DISABLED_SampleTest) {
+TEST(HashTableTest, SampleTest) {
   auto *disk_manager = new DiskManager("test.db");
   auto *bpm = new BufferPoolManagerInstance(50, disk_manager);
   ExtendibleHashTable<int, int, IntComparator> ht("blah", bpm, IntComparator(), HashFunction<int>());
 
   // insert a few values
-  for (int i = 0; i < 5; i++) {
+  for (int i = 0; i < 1000; i++) {
+    if (i == 496) {
+      std::cout << 1 << std::endl;
+    }
     ht.Insert(nullptr, i, i);
     std::vector<int> res;
     ht.GetValue(nullptr, i, &res);
@@ -41,7 +44,7 @@ TEST(HashTableTest, DISABLED_SampleTest) {
   ht.VerifyIntegrity();
 
   // check if the inserted values are all there
-  for (int i = 0; i < 5; i++) {
+  for (int i = 0; i < 1000; i++) {
     std::vector<int> res;
     ht.GetValue(nullptr, i, &res);
     EXPECT_EQ(1, res.size()) << "Failed to keep " << i << std::endl;
@@ -51,7 +54,10 @@ TEST(HashTableTest, DISABLED_SampleTest) {
   ht.VerifyIntegrity();
 
   // insert one more value for each key
-  for (int i = 0; i < 5; i++) {
+  for (int i = 0; i < 1000; i++) {
+    if (i == 776) {
+      std::cout << 2 << std::endl;
+    }
     if (i == 0) {
       // duplicate values for the same key are not allowed
       EXPECT_FALSE(ht.Insert(nullptr, i, 2 * i));
@@ -80,33 +86,38 @@ TEST(HashTableTest, DISABLED_SampleTest) {
 
   // look for a key that does not exist
   std::vector<int> res;
-  ht.GetValue(nullptr, 20, &res);
+  ht.GetValue(nullptr, 20000, &res);  // key:20
   EXPECT_EQ(0, res.size());
 
   // delete some values
-  for (int i = 0; i < 5; i++) {
+  for (int i = 0; i < 1000; i++) {
     EXPECT_TRUE(ht.Remove(nullptr, i, i));
-    std::vector<int> res;
-    ht.GetValue(nullptr, i, &res);
+    std::vector<int> ress;
+    ht.GetValue(nullptr, i, &ress);
     if (i == 0) {
       // (0, 0) is the only pair with key 0
-      EXPECT_EQ(0, res.size());
+      EXPECT_EQ(0, ress.size());
     } else {
-      EXPECT_EQ(1, res.size());
-      EXPECT_EQ(2 * i, res[0]);
+      EXPECT_EQ(1, ress.size());
+      EXPECT_EQ(2 * i, ress[0]);
     }
   }
 
   ht.VerifyIntegrity();
 
   // delete all values
-  for (int i = 0; i < 5; i++) {
+  for (int i = 0; i < 1000; i++) {
+    if (i == 999) {
+      printf("1\n");
+    }
     if (i == 0) {
       // (0, 0) has been deleted
       EXPECT_FALSE(ht.Remove(nullptr, i, 2 * i));
     } else {
       EXPECT_TRUE(ht.Remove(nullptr, i, 2 * i));
     }
+    printf("%d\n", i);
+    ht.VerifyIntegrity();
   }
 
   ht.VerifyIntegrity();

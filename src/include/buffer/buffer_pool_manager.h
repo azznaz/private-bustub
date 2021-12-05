@@ -12,6 +12,7 @@
 
 #pragma once
 
+#include <storage/page/hash_table_directory_page.h>
 #include <list>
 #include <mutex>  // NOLINT
 #include <unordered_map>

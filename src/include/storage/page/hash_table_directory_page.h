@@ -185,6 +185,14 @@ class HashTableDirectoryPage {
    * Prints the current directory
    */
   void PrintDirectory();
+  /**
+   * Growth the current directory
+   */
+  bool Growth();
+  /**
+   * Shrink the current directory
+   */
+  void Shrink();
 
  private:
   page_id_t page_id_;

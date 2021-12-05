@@ -140,7 +140,7 @@ class ExecutorTest : public ::testing::Test {
 };
 
 // NOLINTNEXTLINE
-TEST_F(ExecutorTest, DISABLED_SimpleSeqScanTest) {
+TEST_F(ExecutorTest,SimpleSeqScanTest) {
   // SELECT col_a, col_b FROM test_1 WHERE col_a < 500
 
   // Construct query plan

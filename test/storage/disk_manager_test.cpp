@@ -54,7 +54,6 @@ TEST_F(DiskManagerTest, ReadWritePageTest) {
 
   dm.ShutDown();
 }
-
 // NOLINTNEXTLINE
 TEST_F(DiskManagerTest, ReadWriteLogTest) {
   char buf[16] = {0};
