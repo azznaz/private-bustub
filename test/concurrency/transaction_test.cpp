@@ -1,6 +1,14 @@
-/**
- * transaction_test.cpp
- */
+//===----------------------------------------------------------------------===//
+//
+//                         BusTub
+//
+// transaction_test.cpp
+//
+// Identification: test/concurrency/transaction_test.cpp
+//
+// Copyright (c) 2015-2021, Carnegie Mellon University Database Group
+//
+//===----------------------------------------------------------------------===//
 
 #include <atomic>
 #include <cstdio>
@@ -25,7 +33,7 @@
 #include "execution/plans/nested_index_join_plan.h"
 #include "execution/plans/seq_scan_plan.h"
 #include "gtest/gtest.h"
-#include "storage/b_plus_tree_test_util.h"  // NOLINT
+#include "test_util.h"  // NOLINT
 #include "type/value_factory.h"
 
 #define TEST_TIMEOUT_BEGIN                           \
@@ -177,9 +185,9 @@ TEST_F(TransactionTest, DISABLED_SimpleInsertRollbackTest) {
   auto txn2 = GetTxnManager()->Begin();
   auto exec_ctx2 = std::make_unique<ExecutorContext>(txn2, GetCatalog(), GetBPM(), GetTxnManager(), GetLockManager());
   auto &schema = table_info->schema_;
-  auto col_a = MakeColumnValueExpression(schema, 0, "col_a");
-  auto col_b = MakeColumnValueExpression(schema, 0, "col_b");
-  auto out_schema = MakeOutputSchema({{"col_a", col_a}, {"col_b", col_b}});
+  auto col_a = MakeColumnValueExpression(schema, 0, "colA");
+  auto col_b = MakeColumnValueExpression(schema, 0, "colB");
+  auto out_schema = MakeOutputSchema({{"colA", col_a}, {"colB", col_b}});
   SeqScanPlanNode scan_plan{out_schema, nullptr, table_info->oid_};
 
   std::vector<Tuple> result_set;
@@ -209,20 +217,15 @@ TEST_F(TransactionTest, DISABLED_DirtyReadsTest) {
   auto table_info = exec_ctx1->GetCatalog()->GetTable("empty_table2");
   InsertPlanNode insert_plan{std::move(raw_vals), table_info->oid_};
 
-  Schema *key_schema = ParseCreateStatement("a bigint");
-  GenericComparator<8> comparator(key_schema);
-  //  auto index_info = exec_ctx1->GetCatalog()->CreateIndex<GenericKey<8>, RID, GenericComparator<8>>(
-  //      txn1, "index1", "empty_table2", table_info->schema_, *key_schema, {0}, 8);
-
   GetExecutionEngine()->Execute(&insert_plan, nullptr, txn1, exec_ctx1.get());
 
   // Iterate through table to read the tuples.
   auto txn2 = GetTxnManager()->Begin(nullptr, IsolationLevel::READ_UNCOMMITTED);
   auto exec_ctx2 = std::make_unique<ExecutorContext>(txn2, GetCatalog(), GetBPM(), GetTxnManager(), GetLockManager());
   auto &schema = table_info->schema_;
-  auto col_a = MakeColumnValueExpression(schema, 0, "col_a");
-  auto col_b = MakeColumnValueExpression(schema, 0, "col_b");
-  auto out_schema = MakeOutputSchema({{"col_a", col_a}, {"col_b", col_b}});
+  auto col_a = MakeColumnValueExpression(schema, 0, "colA");
+  auto col_b = MakeColumnValueExpression(schema, 0, "colB");
+  auto out_schema = MakeOutputSchema({{"colA", col_a}, {"colB", col_b}});
   SeqScanPlanNode scan_plan{out_schema, nullptr, table_info->oid_};
 
   std::vector<Tuple> result_set;
@@ -232,23 +235,22 @@ TEST_F(TransactionTest, DISABLED_DirtyReadsTest) {
   delete txn1;
 
   // First value
-  ASSERT_EQ(result_set[0].GetValue(out_schema, out_schema->GetColIdx("col_a")).GetAs<int32_t>(), 200);
-  ASSERT_EQ(result_set[0].GetValue(out_schema, out_schema->GetColIdx("col_b")).GetAs<int32_t>(), 20);
+  ASSERT_EQ(result_set[0].GetValue(out_schema, out_schema->GetColIdx("colA")).GetAs<int32_t>(), 200);
+  ASSERT_EQ(result_set[0].GetValue(out_schema, out_schema->GetColIdx("colB")).GetAs<int32_t>(), 20);
 
   // Second value
-  ASSERT_EQ(result_set[1].GetValue(out_schema, out_schema->GetColIdx("col_a")).GetAs<int32_t>(), 201);
-  ASSERT_EQ(result_set[1].GetValue(out_schema, out_schema->GetColIdx("col_b")).GetAs<int32_t>(), 21);
+  ASSERT_EQ(result_set[1].GetValue(out_schema, out_schema->GetColIdx("colA")).GetAs<int32_t>(), 201);
+  ASSERT_EQ(result_set[1].GetValue(out_schema, out_schema->GetColIdx("colB")).GetAs<int32_t>(), 21);
 
   // Third value
-  ASSERT_EQ(result_set[2].GetValue(out_schema, out_schema->GetColIdx("col_a")).GetAs<int32_t>(), 202);
-  ASSERT_EQ(result_set[2].GetValue(out_schema, out_schema->GetColIdx("col_b")).GetAs<int32_t>(), 22);
+  ASSERT_EQ(result_set[2].GetValue(out_schema, out_schema->GetColIdx("colA")).GetAs<int32_t>(), 202);
+  ASSERT_EQ(result_set[2].GetValue(out_schema, out_schema->GetColIdx("colB")).GetAs<int32_t>(), 22);
 
   // Size
   ASSERT_EQ(result_set.size(), 3);
 
   GetTxnManager()->Commit(txn2);
   delete txn2;
-  delete key_schema;
 }
 
 }  // namespace bustub
