@@ -77,7 +77,7 @@
  * schema of each of the tables used in the tests below. The definition of
  * this function is in `src/catalog/table_generator.cpp`.
  */
-
+#define BIGINT_SIZE 8
 namespace bustub {
 
 // Parameters for index construction
@@ -85,31 +85,13 @@ using KeyType = GenericKey<8>;
 using ValueType = RID;
 using ComparatorType = GenericComparator<8>;
 using HashFunctionType = HashFunction<KeyType>;
+using BigintKeyType = GenericKey<8>;
+using BigintValueType = RID;
+using BigintComparatorType = GenericComparator<8>;
+using BigintHashFunctionType = HashFunction<BigintKeyType>;
 
-<<<<<<< HEAD
- private:
-  std::unique_ptr<TransactionManager> txn_mgr_;
-  Transaction *txn_{nullptr};
-  std::unique_ptr<DiskManager> disk_manager_;
-  std::unique_ptr<LogManager> log_manager_ = nullptr;
-  std::unique_ptr<LockManager> lock_manager_;
-  std::unique_ptr<BufferPoolManager> bpm_;
-  std::unique_ptr<Catalog> catalog_;
-  std::unique_ptr<ExecutorContext> exec_ctx_;
-  std::unique_ptr<ExecutionEngine> execution_engine_;
-  std::vector<std::unique_ptr<AbstractExpression>> allocated_exprs_;
-  std::vector<std::unique_ptr<Schema>> allocated_output_schemas_;
-  static constexpr uint32_t MAX_VARCHAR_SIZE = 128;
-};
-
-// NOLINTNEXTLINE
-TEST_F(ExecutorTest,SimpleSeqScanTest) {
-  // SELECT col_a, col_b FROM test_1 WHERE col_a < 500
-
-=======
 // SELECT col_a, col_b FROM test_1 WHERE col_a < 500
-TEST_F(ExecutorTest, DISABLED_SimpleSeqScanTest) {
->>>>>>> 1458c6e08f83446c12d99f871ea210df6c9660f5
+TEST_F(ExecutorTest, SimpleSeqScanTest) {
   // Construct query plan
   TableInfo *table_info = GetExecutorContext()->GetCatalog()->GetTable("test_1");
   const Schema &schema = table_info->schema_;
@@ -119,9 +101,10 @@ TEST_F(ExecutorTest, DISABLED_SimpleSeqScanTest) {
   auto *predicate = MakeComparisonExpression(col_a, const500, ComparisonType::LessThan);
   auto *out_schema = MakeOutputSchema({{"colA", col_a}, {"colB", col_b}});
   SeqScanPlanNode plan{out_schema, predicate, table_info->oid_};
-
+  std::cout << enable_logging << "\n";
   // Execute
   std::vector<Tuple> result_set{};
+  // GetExecutorContext()->GetBufferPoolManager()
   GetExecutionEngine()->Execute(&plan, &result_set, GetTxn(), GetExecutorContext());
 
   // Verify
@@ -133,7 +116,7 @@ TEST_F(ExecutorTest, DISABLED_SimpleSeqScanTest) {
 }
 
 // INSERT INTO empty_table2 VALUES (100, 10), (101, 11), (102, 12)
-TEST_F(ExecutorTest, DISABLED_SimpleRawInsertTest) {
+TEST_F(ExecutorTest, SimpleRawInsertTest) {
   // Create Values to insert
   std::vector<Value> val1{ValueFactory::GetIntegerValue(100), ValueFactory::GetIntegerValue(10)};
   std::vector<Value> val2{ValueFactory::GetIntegerValue(101), ValueFactory::GetIntegerValue(11)};
@@ -175,7 +158,7 @@ TEST_F(ExecutorTest, DISABLED_SimpleRawInsertTest) {
 }
 
 // INSERT INTO empty_table2 SELECT col_a, col_b FROM test_1 WHERE col_a < 500
-TEST_F(ExecutorTest, DISABLED_SimpleSelectInsertTest) {
+TEST_F(ExecutorTest, SimpleSelectInsertTest) {
   const Schema *out_schema1;
   std::unique_ptr<AbstractPlanNode> scan_plan1;
   {
@@ -227,7 +210,7 @@ TEST_F(ExecutorTest, DISABLED_SimpleSelectInsertTest) {
 }
 
 // INSERT INTO empty_table2 VALUES (100, 10), (101, 11), (102, 12)
-TEST_F(ExecutorTest, DISABLED_SimpleRawInsertWithIndexTest) {
+TEST_F(ExecutorTest, SimpleRawInsertWithIndexTest) {
   // Create Values to insert
   std::vector<Value> val1{ValueFactory::GetIntegerValue(100), ValueFactory::GetIntegerValue(10)};
   std::vector<Value> val2{ValueFactory::GetIntegerValue(101), ValueFactory::GetIntegerValue(11)};
@@ -292,7 +275,7 @@ TEST_F(ExecutorTest, DISABLED_SimpleRawInsertWithIndexTest) {
 }
 
 // UPDATE test_3 SET colB = colB + 1;
-TEST_F(ExecutorTest, DISABLED_SimpleUpdateTest) {
+TEST_F(ExecutorTest, SimpleUpdateTest) {
   // Construct a sequential scan of the table
   const Schema *out_schema{};
   std::unique_ptr<AbstractPlanNode> scan_plan{};
@@ -351,7 +334,7 @@ TEST_F(ExecutorTest, DISABLED_SimpleUpdateTest) {
 }
 
 // DELETE FROM test_1 WHERE col_a == 50;
-TEST_F(ExecutorTest, DISABLED_SimpleDeleteTest) {
+TEST_F(ExecutorTest, SimpleDeleteTest) {
   // Construct query plan
   auto table_info = GetExecutorContext()->GetCatalog()->GetTable("test_1");
   auto &schema = table_info->schema_;
@@ -396,7 +379,7 @@ TEST_F(ExecutorTest, DISABLED_SimpleDeleteTest) {
 }
 
 // SELECT test_1.col_a, test_1.col_b, test_2.col1, test_2.col3 FROM test_1 JOIN test_2 ON test_1.col_a = test_2.col1;
-TEST_F(ExecutorTest, DISABLED_SimpleNestedLoopJoinTest) {
+TEST_F(ExecutorTest, SimpleNestedLoopJoinTest) {
   const Schema *out_schema1;
   std::unique_ptr<AbstractPlanNode> scan_plan1;
   {
@@ -440,7 +423,7 @@ TEST_F(ExecutorTest, DISABLED_SimpleNestedLoopJoinTest) {
 }
 
 // SELECT test_4.colA, test_4.colB, test_6.colA, test_6.colB FROM test_4 JOIN test_6 ON test_4.colA = test_6.colA;
-TEST_F(ExecutorTest, DISABLED_SimpleHashJoinTest) {
+TEST_F(ExecutorTest, SimpleHashJoinTest) {
   // Construct sequential scan of table test_4
   const Schema *out_schema1{};
   std::unique_ptr<AbstractPlanNode> scan_plan1{};
@@ -509,7 +492,7 @@ TEST_F(ExecutorTest, DISABLED_SimpleHashJoinTest) {
 }
 
 // SELECT COUNT(col_a), SUM(col_a), min(col_a), max(col_a) from test_1;
-TEST_F(ExecutorTest, DISABLED_SimpleAggregationTest) {
+TEST_F(ExecutorTest, SimpleAggregationTest) {
   const Schema *scan_schema;
   std::unique_ptr<AbstractPlanNode> scan_plan;
   {
@@ -559,7 +542,7 @@ TEST_F(ExecutorTest, DISABLED_SimpleAggregationTest) {
 }
 
 // SELECT count(col_a), col_b, sum(col_c) FROM test_1 Group By col_b HAVING count(col_a) > 100
-TEST_F(ExecutorTest, DISABLED_SimpleGroupByAggregation) {
+TEST_F(ExecutorTest, SimpleGroupByAggregation) {
   const Schema *scan_schema;
   std::unique_ptr<AbstractPlanNode> scan_plan;
   {
@@ -612,7 +595,7 @@ TEST_F(ExecutorTest, DISABLED_SimpleGroupByAggregation) {
 }
 
 // SELECT colA, colB FROM test_3 LIMIT 10
-TEST_F(ExecutorTest, DISABLED_SimpleLimitTest) {
+TEST_F(ExecutorTest, SimpleLimitTest) {
   auto *table_info = GetExecutorContext()->GetCatalog()->GetTable("test_3");
   auto &schema = table_info->schema_;
 
@@ -640,7 +623,7 @@ TEST_F(ExecutorTest, DISABLED_SimpleLimitTest) {
 }
 
 // SELECT DISTINCT colC FROM test_7
-TEST_F(ExecutorTest, DISABLED_SimpleDistinctTest) {
+TEST_F(ExecutorTest, SimpleDistinctTest) {
   auto *table_info = GetExecutorContext()->GetCatalog()->GetTable("test_7");
   auto &schema = table_info->schema_;
 
@@ -673,6 +656,243 @@ TEST_F(ExecutorTest, DISABLED_SimpleDistinctTest) {
   std::iota(expected.begin(), expected.end(), 0);
 
   ASSERT_TRUE(std::equal(results.cbegin(), results.cend(), expected.cbegin()));
+}
+TEST_F(ExecutorTest, DeleteEntireTable) {
+  // Construct a sequential scan of the table
+  const Schema *out_schema{};
+  std::unique_ptr<AbstractPlanNode> scan_plan{};
+  {
+    auto *table_info = GetExecutorContext()->GetCatalog()->GetTable("test_1");
+    auto &schema = table_info->schema_;
+    auto col_a = MakeColumnValueExpression(schema, 0, "colA");
+    auto col_b = MakeColumnValueExpression(schema, 0, "colB");
+    out_schema = MakeOutputSchema({{"colA", col_a}, {"colB", col_b}});
+    scan_plan = std::make_unique<SeqScanPlanNode>(out_schema, nullptr, table_info->oid_);
+  }
+
+  // Construct a deletion plan
+  std::unique_ptr<AbstractPlanNode> delete_plan;
+  {
+    auto *table_info = GetExecutorContext()->GetCatalog()->GetTable("test_1");
+    delete_plan = std::make_unique<DeletePlanNode>(scan_plan.get(), table_info->oid_);
+  }
+
+  std::vector<Tuple> result_set{};
+
+  // Execute an initial sequential scan, ensure all expected tuples are present
+  GetExecutionEngine()->Execute(scan_plan.get(), &result_set, GetTxn(), GetExecutorContext());
+
+  // Verify all the tuples are present
+  ASSERT_EQ(result_set.size(), TEST1_SIZE);
+  result_set.clear();
+
+  // Execute deletion of all tuples in the table
+  GetExecutionEngine()->Execute(delete_plan.get(), &result_set, GetTxn(), GetExecutorContext());
+
+  // DeleteExecutor should not modify the result set
+  ASSERT_EQ(result_set.size(), 0);
+  result_set.clear();
+
+  // Execute another sequential scan; no tuples should be present in the table
+  GetExecutionEngine()->Execute(scan_plan.get(), &result_set, GetTxn(), GetExecutorContext());
+  ASSERT_EQ(result_set.size(), 0);
+}
+
+TEST_F(ExecutorTest, DeleteEntireTableWithIndex) {
+  // Construct a sequential scan of the table
+  const Schema *out_schema{};
+  std::unique_ptr<AbstractPlanNode> scan_plan{};
+  {
+    auto *table_info = GetExecutorContext()->GetCatalog()->GetTable("test_4");
+    auto &schema = table_info->schema_;
+    auto col_a = MakeColumnValueExpression(schema, 0, "colA");
+    auto col_b = MakeColumnValueExpression(schema, 0, "colB");
+    out_schema = MakeOutputSchema({{"colA", col_a}, {"colB", col_b}});
+    scan_plan = std::make_unique<SeqScanPlanNode>(out_schema, nullptr, table_info->oid_);
+  }
+
+  // Construct a deletion plan
+  std::unique_ptr<AbstractPlanNode> delete_plan;
+  {
+    auto *table_info = GetExecutorContext()->GetCatalog()->GetTable("test_4");
+    delete_plan = std::make_unique<DeletePlanNode>(scan_plan.get(), table_info->oid_);
+  }
+
+  std::vector<Tuple> result_set{};
+
+  // Execute an initial sequential scan, ensure all expected tuples are present
+  GetExecutionEngine()->Execute(scan_plan.get(), &result_set, GetTxn(), GetExecutorContext());
+
+  ASSERT_EQ(result_set.size(), TEST4_SIZE);
+
+  // Construct an index on the populated table
+  auto table_info = GetExecutorContext()->GetCatalog()->GetTable("test_4");
+  auto key_schema = std::unique_ptr<Schema>{ParseCreateStatement("a bigint")};
+  auto key_attrs = std::vector<uint32_t>{0};
+  auto *index_info =
+      GetExecutorContext()->GetCatalog()->CreateIndex<BigintKeyType, BigintValueType, BigintComparatorType>(
+          GetTxn(), "index1", "test_4", table_info->schema_, *key_schema, key_attrs, BIGINT_SIZE,
+          BigintHashFunctionType{});
+  ASSERT_NE(Catalog::NULL_INDEX_INFO, index_info);
+
+  // Ensure that all tuples are present in the index
+  {
+    auto *table_info_ = GetExecutorContext()->GetCatalog()->GetTable("test_4");
+    auto &table_schema = table_info_->schema_;
+    auto *index = index_info->index_.get();
+    for (auto &tuple : result_set) {
+      std::vector<RID> scanned{};
+      const Tuple key = tuple.KeyFromTuple(table_schema, *key_schema, key_attrs);
+      index->ScanKey(key, &scanned, GetTxn());
+      ASSERT_EQ(1, scanned.size());
+    }
+  }
+
+  // Execute deletion of all tuples in the table
+  std::vector<Tuple> delete_result_set{};
+  GetExecutionEngine()->Execute(delete_plan.get(), &delete_result_set, GetTxn(), GetExecutorContext());
+
+  // DeleteExecutor should not modify the result set
+  ASSERT_EQ(delete_result_set.size(), 0);
+  delete_result_set.clear();
+
+  // Execute another sequential scan; no tuples should be present in the table
+  GetExecutionEngine()->Execute(scan_plan.get(), &delete_result_set, GetTxn(), GetExecutorContext());
+  ASSERT_EQ(delete_result_set.size(), 0);
+
+  // The index for the table should now be empty
+  {
+    auto *table_info_ = GetExecutorContext()->GetCatalog()->GetTable("test_4");
+    auto &table_schema = table_info_->schema_;
+    auto *index = index_info->index_.get();
+    // Iterate over the original result set which contains original tuples from table
+    for (auto &tuple : result_set) {
+      std::vector<RID> scanned{};
+      const Tuple key = tuple.KeyFromTuple(table_schema, *key_schema, key_attrs);
+      index->ScanKey(key, &scanned, GetTxn());
+      ASSERT_TRUE(scanned.empty());
+    }
+  }
+}
+
+// Delete a single tuple from a table
+TEST_F(ExecutorTest, DeleteSingleTuple) {
+  // Construct a scan of the table that selects only a single tuple
+  const Schema *scan_schema;
+  std::unique_ptr<SeqScanPlanNode> scan_plan;
+  {
+    auto *table_info = GetExecutorContext()->GetCatalog()->GetTable("test_4");
+    auto &schema = table_info->schema_;
+    auto *col_a = MakeColumnValueExpression(schema, 0, "colA");
+    auto *col_b = MakeColumnValueExpression(schema, 0, "colB");
+    auto *col_c = MakeColumnValueExpression(schema, 0, "colC");
+    auto *const0 = MakeConstantValueExpression(ValueFactory::GetBigIntValue(0));
+    auto *predicate = MakeComparisonExpression(col_a, const0, ComparisonType::Equal);
+    scan_schema = MakeOutputSchema({{"colA", col_a}, {"colB", col_b}, {"colC", col_c}});
+    scan_plan = std::make_unique<SeqScanPlanNode>(scan_schema, predicate, table_info->oid_);
+  }
+
+  // Construct the delete plan
+  std::unique_ptr<DeletePlanNode> delete_plan;
+  {
+    auto *table_info = GetExecutorContext()->GetCatalog()->GetTable("test_4");
+    delete_plan = std::make_unique<DeletePlanNode>(scan_plan.get(), table_info->oid_);
+  }
+
+  // Construct an index on the target table
+  auto *table_info = GetExecutorContext()->GetCatalog()->GetTable("test_4");
+  auto key_schema = std::unique_ptr<Schema>{ParseCreateStatement("a bigint")};
+  auto key_attrs = std::vector<uint32_t>{0};
+  auto *index_info =
+      GetExecutorContext()->GetCatalog()->CreateIndex<BigintKeyType, BigintValueType, BigintComparatorType>(
+          GetTxn(), "index1", "test_4", table_info->schema_, *key_schema, key_attrs, BIGINT_SIZE,
+          BigintHashFunctionType{});
+  ASSERT_NE(Catalog::NULL_INDEX_INFO, index_info);
+
+  auto delete_txn = std::unique_ptr<Transaction>{GetTxnManager()->Begin()};
+  auto delete_exec_ctx =
+      std::make_unique<ExecutorContext>(delete_txn.get(), GetCatalog(), GetBPM(), GetTxnManager(), GetLockManager());
+
+  // Execute the delete plan
+  std::vector<Tuple> result_set{};
+  GetExecutionEngine()->Execute(delete_plan.get(), &result_set, delete_txn.get(), delete_exec_ctx.get());
+  ASSERT_EQ(result_set.size(), 0);
+
+  GetTxnManager()->Commit(delete_txn.get());
+  result_set.clear();
+
+  // Now perform a full table scan
+  std::unique_ptr<SeqScanPlanNode> full_scan;
+  { full_scan = std::make_unique<SeqScanPlanNode>(scan_schema, nullptr, table_info->oid_); }
+
+  GetExecutionEngine()->Execute(full_scan.get(), &result_set, GetTxn(), GetExecutorContext());
+  EXPECT_EQ(result_set.size(), TEST4_SIZE - 1);
+
+  // The deleted value should not be present in the result set
+  for (const auto &tuple : result_set) {
+    EXPECT_NE(tuple.GetValue(scan_schema, scan_schema->GetColIdx("colA")).GetAs<int64_t>(), static_cast<int64_t>(0));
+  }
+
+  // Ensure the deleted value is not present in the index
+  auto *table = table_info->table_.get();
+  auto &table_schema = table_info->schema_;
+  auto *index = index_info->index_.get();
+  // Iterate over the original result set which contains original tuples from table
+  for (auto &tuple : result_set) {
+    std::vector<RID> scanned{};
+    const Tuple key = tuple.KeyFromTuple(table_schema, *key_schema, key_attrs);
+    index->ScanKey(key, &scanned, GetTxn());
+    ASSERT_EQ(1, scanned.size());
+
+    Tuple queried{};
+    table->GetTuple(scanned.front(), &queried, GetTxn());
+    EXPECT_NE(tuple.GetValue(scan_schema, scan_schema->GetColIdx("colA")).GetAs<int64_t>(), static_cast<int64_t>(0));
+  }
+}
+
+TEST_F(ExecutorTest, DeleteIntegrated) {
+  // SELECT colA FROM test_1 WHERE colA < 50
+  const Schema *output_schema;
+  std::unique_ptr<SeqScanPlanNode> scan_plan;
+  {
+    auto *table_info = GetExecutorContext()->GetCatalog()->GetTable("test_1");
+    auto &schema = table_info->schema_;
+    auto col_a = MakeColumnValueExpression(schema, 0, "colA");
+    auto const50 = MakeConstantValueExpression(ValueFactory::GetIntegerValue(50));
+    auto predicate = MakeComparisonExpression(col_a, const50, ComparisonType::LessThan);
+    output_schema = MakeOutputSchema({{"colA", col_a}});
+    scan_plan = std::make_unique<SeqScanPlanNode>(output_schema, predicate, table_info->oid_);
+  }
+
+  // Execute scan
+  std::vector<Tuple> result_set{};
+  GetExecutionEngine()->Execute(scan_plan.get(), &result_set, GetTxn(), GetExecutorContext());
+
+  // Result set size
+  ASSERT_EQ(result_set.size(), 50);
+
+  // Verify tuple contents
+  for (const auto &tuple : result_set) {
+    ASSERT_TRUE(tuple.GetValue(output_schema, output_schema->GetColIdx("colA")).GetAs<int32_t>() < 50);
+  }
+
+  result_set.clear();
+
+  // DELETE FROM test_1 WHERE colA < 50
+  std::unique_ptr<DeletePlanNode> delete_plan;
+  {
+    auto *table_info = GetExecutorContext()->GetCatalog()->GetTable("test_1");
+    delete_plan = std::make_unique<DeletePlanNode>(scan_plan.get(), table_info->oid_);
+  }
+
+  GetExecutionEngine()->Execute(delete_plan.get(), nullptr, GetTxn(), GetExecutorContext());
+
+  // Delete should not modify the result set
+  ASSERT_TRUE(result_set.empty());
+
+  // Execute the scan again
+  GetExecutionEngine()->Execute(scan_plan.get(), &result_set, GetTxn(), GetExecutorContext());
+  ASSERT_TRUE(result_set.empty());
 }
 
 }  // namespace bustub

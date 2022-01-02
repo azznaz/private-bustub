@@ -36,7 +36,13 @@ class ComparisonExpression : public AbstractExpression {
 
   Value Evaluate(const Tuple *tuple, const Schema *schema) const override {
     Value lhs = GetChildAt(0)->Evaluate(tuple, schema);
+    // int left = lhs.GetAs<int32_t>();
     Value rhs = GetChildAt(1)->Evaluate(tuple, schema);
+    // int right = rhs.GetAs<int32_t>();
+    //    printf("%d %d\n",left,right);
+    //    if(left == 500){
+    //      right++;
+    //    }
     return ValueFactory::GetBooleanValue(PerformComparison(lhs, rhs));
   }
 

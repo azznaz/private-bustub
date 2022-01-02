@@ -40,12 +40,6 @@ BufferPoolManagerInstance::BufferPoolManagerInstance(size_t pool_size, uint32_t 
   for (size_t i = 0; i < pool_size_; ++i) {
     free_list_.emplace_back(static_cast<int>(i));
   }
-  std::ifstream file("/autograder/bustub/test/container/grading_hash_table_concurrent_test.cpp");
-  std::string str;
-  while (file.good()) {
-    std::getline(file, str);
-    std::cout << str << std::endl;
-  }
 }
 
 BufferPoolManagerInstance::~BufferPoolManagerInstance() {

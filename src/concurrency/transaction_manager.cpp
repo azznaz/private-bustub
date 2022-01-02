@@ -25,8 +25,8 @@ std::shared_mutex TransactionManager::txn_map_mutex = {};
 
 Transaction *TransactionManager::Begin(Transaction *txn, IsolationLevel isolation_level) {
   // Acquire the global transaction latch in shared mode.
-  global_txn_latch_.RLock();
 
+  global_txn_latch_.RLock();
   if (txn == nullptr) {
     txn = new Transaction(next_txn_id_++, isolation_level);
   }
@@ -37,6 +37,7 @@ Transaction *TransactionManager::Begin(Transaction *txn, IsolationLevel isolatio
 }
 
 void TransactionManager::Commit(Transaction *txn) {
+  //  printf("%d read commit\n",txn->GetTransactionId());
   txn->SetState(TransactionState::COMMITTED);
 
   // Perform all deletes before we commit.
@@ -56,9 +57,11 @@ void TransactionManager::Commit(Transaction *txn) {
   ReleaseLocks(txn);
   // Release the global transaction latch.
   global_txn_latch_.RUnlock();
+  //  printf("%d finish commit\n",txn->GetTransactionId());
 }
 
 void TransactionManager::Abort(Transaction *txn) {
+  //  printf("%d read abort\n",txn->GetTransactionId());
   txn->SetState(TransactionState::ABORTED);
   // Rollback before releasing the lock.
   auto table_write_set = txn->GetWriteSet();
@@ -106,6 +109,7 @@ void TransactionManager::Abort(Transaction *txn) {
   ReleaseLocks(txn);
   // Release the global transaction latch.
   global_txn_latch_.RUnlock();
+  //  printf("%d finish abort\n",txn->GetTransactionId());
 }
 
 void TransactionManager::BlockAllTransactions() { global_txn_latch_.WLock(); }

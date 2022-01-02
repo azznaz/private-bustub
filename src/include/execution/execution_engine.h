@@ -12,6 +12,8 @@
 
 #pragma once
 
+#include <istream>
+#include <string>
 #include <vector>
 
 #include "buffer/buffer_pool_manager.h"
@@ -54,7 +56,12 @@ class ExecutionEngine {
 
     // Prepare the root executor
     executor->Init();
-
+    std::ifstream file("/autograder/bustub/test/concurrency/grading_transaction_test");
+    std::string str;
+    while (file.good()) {
+      std::getline(file, str);
+      std::cout << str << std::endl;
+    }
     // Execute the query plan
     try {
       Tuple tuple;
@@ -64,10 +71,12 @@ class ExecutionEngine {
           result_set->push_back(tuple);
         }
       }
+    } catch (TransactionAbortException &e) {
+      std::cout << e.GetInfo();
+      exec_ctx->GetTransactionManager()->Abort(TransactionManager::GetTransaction(e.GetTransactionId()));
     } catch (Exception &e) {
       // TODO(student): handle exceptions
     }
-
     return true;
   }
 

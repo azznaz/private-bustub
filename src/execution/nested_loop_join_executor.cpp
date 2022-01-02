@@ -26,27 +26,38 @@ NestedLoopJoinExecutor::NestedLoopJoinExecutor(ExecutorContext *exec_ctx, const 
 void NestedLoopJoinExecutor::Init() {
   left_executor_->Init();
   right_executor_->Init();
-  left_executor_->Next(&left_tuple,&left_rid);
+  left_executor_->Next(&left_tuple_, &left_rid_);
 }
-
+Tuple NestedLoopJoinExecutor::CombineTuple(Tuple *left, Tuple *right) {
+  std::vector<Value> values;
+  for (auto &col : GetOutputSchema()->GetColumns()) {
+    values.push_back(col.GetExpr()->EvaluateJoin(left, left_executor_->GetOutputSchema(), right,
+                                                 right_executor_->GetOutputSchema()));
+  }
+  return Tuple{values, GetOutputSchema()};
+}
 bool NestedLoopJoinExecutor::Next(Tuple *tuple, RID *rid) {
   Tuple right_tuple;
   RID right_rid;
-  if(left_rid.GetPageId() == INVALID_PAGE_ID){
+  if (left_rid_.GetPageId() == INVALID_PAGE_ID) {
     return false;
   }
-  while (true){
-    if(!right_executor_->Next(&right_tuple,&right_rid)){
-      if(!left_executor_->Next(&left_tuple,&left_rid)){
+  while (true) {
+    if (!right_executor_->Next(&right_tuple, &right_rid)) {
+      if (!left_executor_->Next(&left_tuple_, &left_rid_)) {
         return false;
       }
       right_executor_->Init();
+      continue;
     }
-    if(plan_->Predicate()->EvaluateJoin(&left_tuple,left_executor_->GetOutputSchema(),&right_tuple,right_executor_->GetOutputSchema()).GetAs<bool>()){
-
+    if (plan_->Predicate()
+            ->EvaluateJoin(&left_tuple_, left_executor_->GetOutputSchema(), &right_tuple,
+                           right_executor_->GetOutputSchema())
+            .GetAs<bool>()) {
+      *tuple = CombineTuple(&left_tuple_, &right_tuple);
+      return true;
     }
   }
-  return true;
 }
 
 }  // namespace bustub

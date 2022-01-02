@@ -97,6 +97,7 @@ class TransactionManager {
       lock_set.emplace(item);
     }
     for (auto locked_rid : lock_set) {
+      //      printf("unlock %d\n",txn->GetTransactionId());
       lock_manager_->Unlock(txn, locked_rid);
     }
   }

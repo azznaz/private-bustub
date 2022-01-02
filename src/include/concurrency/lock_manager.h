@@ -51,6 +51,8 @@ class LockManager {
     std::condition_variable cv_;
     // txn_id of an upgrading transaction (if any)
     txn_id_t upgrading_ = INVALID_TXN_ID;
+    txn_id_t wrting_ = INVALID_TXN_ID;
+    size_t share_count_ = 0;
   };
 
  public:
@@ -109,6 +111,16 @@ class LockManager {
 
   /** Lock table for lock requests. */
   std::unordered_map<RID, LockRequestQueue> lock_table_;
+
+  std::list<LockManager::LockRequest>::iterator AddShareLock(LockRequestQueue *lock_request_queue,
+                                                             LockRequest lock_request, const RID &rid);
+
+  std::list<LockManager::LockRequest>::iterator AddExclusiveLock(LockRequestQueue *lock_request_queue,
+                                                                 LockRequest lock_request, const RID &rid);
+
+  std::list<LockManager::LockRequest>::iterator AddUpgradeLock(LockRequestQueue *lock_request_queue,
+                                                               LockRequest lock_request, const RID &rid);
+  bool GrantLock(LockRequestQueue *lock_request_queue);
 };
 
 }  // namespace bustub
